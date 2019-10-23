@@ -5,6 +5,10 @@ var height = 600;
 
 var continents = [];
 
+var names =continents.forEach(function(continent) {
+  return continent;
+});
+
 for (var i =0; i < birthData.length; i++) {
   var continent = birthData[i].continent;
   if( continents.indexOf(continent) === -1 ) {
@@ -15,6 +19,10 @@ for (var i =0; i < birthData.length; i++) {
 var colorScale = d3.scaleOrdinal()
   .domain(continents)
   .range(d3.schemeCategory10);
+
+var tooltip = d3.select('body')
+  .append('div')
+  .classed('tooltip', true);
 
 d3.select('svg')
   .attr('width', width)
@@ -31,8 +39,24 @@ d3.select('input')
     makeGraph(+d3.event.target.value);
   });
 
-
 makeGraph(minYear);
+
+function showToolTip(d) {
+  tooltip
+    .style('opacity', 1)
+    .style('left', d3.event.x - (tooltip.node().offsetWidth /2) + 'px')
+    .style('top', d3.event.y + 25 + 'px')
+    .html(`
+        <p>Region: ${d.data.region}</p>
+        <p>Continent: ${d.data.continent}</p>
+        <p>Births: ${d.data.births.toLocaleString()}</p>
+      `);  
+}
+  
+function hideToolTip() {
+  tooltip
+    .style('opacity', 0);
+}
   
 
 function makeGraph(year) {
@@ -65,6 +89,10 @@ function makeGraph(year) {
     .merge(update)
     .attr('fill', d => colorScale(d.data.continent))
     .attr('stroke', 'black')
-    .attr('d', path);
+    .attr('d', path)
+    .on('mousemove', showToolTip)
+    .on('touchStart', showToolTip)
+    .on('mouseout', hideToolTip)
+    .on('touchEnd', hideToolTip);
 
 }
