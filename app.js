@@ -40,6 +40,11 @@ function makeGraph(year) {
 
   var arcs = d3.pie()
     .value(d => d.births)
+    .sort(function(a, b){
+      if (a.continent < b.continent) return -1;
+      else if (a.continent > b.continent) return 1;
+      else return a.births - b.births;
+    })
     (yearData);
 
   var path = d3.arc()
